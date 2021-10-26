@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chot</title>
+</head>
+<body>
+    <section>
+        <img class="tl" src="https://media.discordapp.net/attachments/434425360034168854/902454120965890088/20210709_122645-removebg-preview.png">
+        <img class="tr" src="https://media.discordapp.net/attachments/434425360034168854/902454120965890088/20210709_122645-removebg-preview.png">
+        <img class="br" src="https://media.discordapp.net/attachments/434425360034168854/902454120965890088/20210709_122645-removebg-preview.png">
+        <img class="bl" src="https://media.discordapp.net/attachments/434425360034168854/902454120965890088/20210709_122645-removebg-preview.png">
+    </section>
+
+    <span>
+        <label for="bounce">Bounce</label></label><input type="checkbox" name="" id="bounce">
+    </span>
+    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            animate()
+            randomBackground()
+        })
+
+        var intervals = []
+
+        var fixBounce = false
+
+        function animate(bounce = false) {
+
+            var imgs = document.querySelectorAll('section img')
+
+            var max = 45
+            var min = 20
+
+            
+
+            for(let int of intervals) {
+                window.clearInterval(int)
+            }
+
+            imgs.forEach((img) => {
+                img.classList.add('animate')
+                img.style.height = toPixel(30) + "px"
+                setTimeout(() => {
+                    img.classList.remove('animate')
+                }, 0.5)
+            })
+
+            setTimeout(() => {
+                for(let img of imgs) {
+                    if(bounce) {
+                        resize(img, min, max)
+                    } else {
+                        vectorize(img)
+                    }
+                }
+            }, 0.5)
+        }
+
+        document.querySelector('input').addEventListener('click',()=>{
+            var cb = document.querySelector('input')
+            fixBounce = cb.checked
+            animate(cb.checked)
+        })
+
+        function randomBackground() {
+            var speed = getRandomInt(200,400)
+            setInterval(() => {
+                
+                var r = getRandomInt(0,255)
+                var g = getRandomInt(0,255)
+                var b = getRandomInt(0,255)
+
+                document.body.style.backgroundColor = "rgb("+r+","+g+","+b+")"
+
+                var speed = getRandomInt(200,400)
+
+            }, speed)
+        }
+
+        var imgVec = []
+
+        function vectorize(image) {
+            const rect = image.getBoundingClientRect();
+            var split = 0 //rect.height / 2
+
+
+            var vectorCat = [image, rect.x + split,rect.y + split]
+            imgVec.push(vectorCat)
+        }
+
+        document.addEventListener('mousemove', e => {
+
+            if(fixBounce) {
+                return
+            }
+
+            var mouseVec = [e.clientX, e.clientY]
+
+            for(let vec of imgVec) {
+                let tempVec = [vec[1], vec[2]]
+
+                var absVec = [Math.abs(tempVec[0] - mouseVec[0]), Math.abs(tempVec[1] - mouseVec[1])]
+
+                var ratio = absVec[0] + absVec[1] 
+
+
+                var newheight = Math.round(ratio / 3) 
+
+                if(toVH(newheight) > 45) {
+                    newheight = toPixel(45)
+                }
+
+                vec[0].style.height = newheight+ "px"
+            }
+        });
+
+        function resize(image, min, max) {
+
+            var step = 0.2
+
+            var speed = getRandomInt(1,7)
+
+            intervals.push(setInterval(() => {
+                let vh = toVH(image.height)
+
+                if(vh >= max || vh <= min) {
+                    step = step * -1
+
+                    max = getRandomInt(35,45)
+                    min = getRandomInt(15,25)
+                }
+
+                vh += step
+
+                var pxl = toPixel(vh)
+
+                image.style.height = pxl + "px"
+
+                speed = getRandomInt(1,7)
+
+            }, speed))
+            
+        }
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function toVH(px) {
+            return px * (100 / window.innerHeight)
+        }
+
+        function toPixel(vh) {
+            return window.innerHeight * (vh / 100) 
+        }
+
+    </script>
+
+    <style>
+
+        span {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        section img {
+            position: absolute;
+            height: 30vh;
+            width: auto;
+        }
+
+        .animate {
+            transition: 0.5s all ease-in-out;
+        }
+
+        .tl {
+            top: 0;
+            left: 0;
+            transform: rotateX(180deg);
+        }
+
+        .tr {
+            top: 0;
+            right: 0;
+            transform: rotateY(180deg) rotateX(180deg);
+        }
+
+        .br {
+            bottom: 0;
+            right: 0;
+            transform: rotateY(180deg);
+        }
+
+        .bl {
+            bottom: 0;
+            left: 0;
+        }
+
+        ;
+    </style>
+</body>
+</html>
